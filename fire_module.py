@@ -1,14 +1,11 @@
 from graphics import *
 import  random
 
+PBURN   = 1000
+PGROWTH = 10
+
 class Cell:
-
     state = 'E'
-    PBURN   = 0.00006
-    #6/100000
-    PGROWTH = 0.01
-    #1/100
-
     def isBurning(self):
         return self.state == 'B'
 
@@ -22,10 +19,10 @@ class Cell:
         if self.hasTree():
             if hasBurningNeighbour:
                 self.state = 'B'
-            elif random.randint(1,1000) <= 6:
+            elif random.randint(1,PBURN) <= 6:
                 self.state = 'B'
         elif self.isEmpty():
-            if random.randint(1,10) == 1:
+            if random.randint(1,PGROWTH) == 1:
                 self.state = 'T'
         elif self.isBurning():
             self.state = 'E'
@@ -57,9 +54,9 @@ class Forest:
     def __init__(self, width, height):
         self.width  = width
         self.height = height
-        for x in range(height):
+        for x in range(self.width):
             column = []
-            for y in range(width):
+            for y in range(self.height):
                 column.append(Cell())
             self.area.append(column)
 
@@ -101,50 +98,51 @@ class Forest:
         return f
 
 class ForestSimulator: 
-    WIDTH  = 20
-    HEIGHT = 20
-    CELL_SIZE = 4
-    APLLICATION_WIDTH  = WIDTH  * CELL_SIZE
+    WIDTH  = 50
+    HEIGHT = 50
+    CELL_SIZE = 5
+    APLLICATION_WIDTH  = WIDTH  * CELL_SIZE 
     APLLICATION_HEIGHT = HEIGHT * CELL_SIZE
     EMPTY   = "black"
     TREE    = "green"
     BURNING = "red"
-
     def run(self):
         window = []
-        win = GraphWin('Forest', self.APLLICATION_WIDTH, self.APLLICATION_HEIGHT)
+        win = GraphWin('Forest', self.APLLICATION_WIDTH, self.APLLICATION_HEIGHT, autoflush=True)
         for x in range(self.WIDTH):
             column = []
             for y in range(self.HEIGHT):
-                b = Rectangle(Point(x*self.CELL_SIZE, y*self.CELL_SIZE),Point(4, 4))
+                b = Rectangle(Point(x*self.CELL_SIZE, y*self.CELL_SIZE),Point(x*self.CELL_SIZE+self.CELL_SIZE, y*self.CELL_SIZE+self.CELL_SIZE))
                 b.setFill(self.EMPTY)
+                b.setOutline(self.EMPTY)
                 b.draw(win)
                 column.append(b)
             window.append(column)
+        forest = Forest(self.WIDTH,self.HEIGHT)    
         while True:
-            forest = Forest(self.WIDTH,self.HEIGHT)
             cordinates = forest.step()
             state = forest.cellAt(cordinates.getX(),cordinates.getY()).getState()
-            print (state)
-            print (window[cordinates.getX()][cordinates.getY()])
             if state == 'E':
                 window[cordinates.getX()][cordinates.getY()].setFill(self.EMPTY)
+                window[cordinates.getX()][cordinates.getY()].setOutline(self.EMPTY)
             elif state == 'T':
                 window[cordinates.getX()][cordinates.getY()].setFill(self.TREE)
-            elif state == 'B':        
-                window[cordinates.getX()][cordinates.getY()].setFill(self.BURNING)
-            time.sleep(.01)
-            #win.getMouse()
+                window[cordinates.getX()][cordinates.getY()].setOutline(self.TREE)
+            elif state == 'B':   
+                window[cordinates.getX()][cordinates.getY()].setFill(self.BURNING)     
+                window[cordinates.getX()][cordinates.getY()].setOutline(self.BURNING)
+        win.close()
 
 if __name__ == "__main__":
     a = ForestSimulator()
     a.run()
-    """     win = GraphWin('Forest', 100, 100)
+    '''win = GraphWin('Forest', 100, 100)
     b = Rectangle(Point(4, 4), Point(4, 4))
-    c = Rectangle(Point(20, 20), Point(30, 30))
+    c = Rectangle(Point(1,3), Point(4,7))
     b.setFill("red")
     b.draw(win)  
+    win.getMouse() 
     c.setFill("brown")
     c.draw(win)   
     win.getMouse() 
-    win.close() """
+    win.close()'''
