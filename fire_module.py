@@ -1,11 +1,15 @@
 from graphics import *
 import  random
 
-PBURN   = 1000
-PGROWTH = 10
+PBURN   = 100000
+PGROWTH = 100
+EMPTY   = "black"
+TREE    = "green"
+BURNING = "red"
 
 class Cell:
     state = 'E'
+
     def isBurning(self):
         return self.state == 'B'
 
@@ -31,7 +35,6 @@ class Cell:
         return self.state
 
 class Coordinates:
-
     x = 0
     y = 0
 
@@ -46,7 +49,6 @@ class Coordinates:
         return self.y 
 
 class Forest:
-
     width  = 0
     height = 0
     area   = []
@@ -73,10 +75,9 @@ class Forest:
             return None
 
     def hasBurningNeighbour(self,x,y):
-
-        for i in range(x-1,x+1):
-            for j in range(y-1,y+1):
-                if self.cellAt(i,j) is not None and (i != x and j != y):
+        for i in range(x-1,x+2):
+            for j in range(y-1,y+2):
+                if self.cellAt(i,j) is not None and not(i == x and j == y):
                     if self.cellAt(i,j).isBurning():
                         return True
         return False
@@ -98,51 +99,34 @@ class Forest:
         return f
 
 class ForestSimulator: 
-    WIDTH  = 50
-    HEIGHT = 50
-    CELL_SIZE = 5
-    APLLICATION_WIDTH  = WIDTH  * CELL_SIZE 
-    APLLICATION_HEIGHT = HEIGHT * CELL_SIZE
-    EMPTY   = "black"
-    TREE    = "green"
-    BURNING = "red"
-    def run(self):
+    
+    def run(self, width, height, cell_size):
         window = []
-        win = GraphWin('Forest', self.APLLICATION_WIDTH, self.APLLICATION_HEIGHT, autoflush=True)
-        for x in range(self.WIDTH):
+        win = GraphWin('Forest', width  * cell_size, height * cell_size, autoflush=True)
+        for x in range(width):
             column = []
-            for y in range(self.HEIGHT):
-                b = Rectangle(Point(x*self.CELL_SIZE, y*self.CELL_SIZE),Point(x*self.CELL_SIZE+self.CELL_SIZE, y*self.CELL_SIZE+self.CELL_SIZE))
-                b.setFill(self.EMPTY)
-                b.setOutline(self.EMPTY)
+            for y in range(height):
+                b = Rectangle(Point(x*cell_size, y*cell_size),Point(x*cell_size+cell_size, y*cell_size+cell_size))
+                b.setFill(EMPTY)
+                b.setOutline(EMPTY)
                 b.draw(win)
                 column.append(b)
             window.append(column)
-        forest = Forest(self.WIDTH,self.HEIGHT)    
+        forest = Forest(width,height)    
         while True:
             cordinates = forest.step()
             state = forest.cellAt(cordinates.getX(),cordinates.getY()).getState()
             if state == 'E':
-                window[cordinates.getX()][cordinates.getY()].setFill(self.EMPTY)
-                window[cordinates.getX()][cordinates.getY()].setOutline(self.EMPTY)
+                window[cordinates.getX()][cordinates.getY()].setFill(EMPTY)
+                window[cordinates.getX()][cordinates.getY()].setOutline(EMPTY)
             elif state == 'T':
-                window[cordinates.getX()][cordinates.getY()].setFill(self.TREE)
-                window[cordinates.getX()][cordinates.getY()].setOutline(self.TREE)
+                window[cordinates.getX()][cordinates.getY()].setFill(TREE)
+                window[cordinates.getX()][cordinates.getY()].setOutline(TREE)
             elif state == 'B':   
-                window[cordinates.getX()][cordinates.getY()].setFill(self.BURNING)     
-                window[cordinates.getX()][cordinates.getY()].setOutline(self.BURNING)
-        win.close()
+                window[cordinates.getX()][cordinates.getY()].setFill(BURNING)     
+                window[cordinates.getX()][cordinates.getY()].setOutline(BURNING) 
 
 if __name__ == "__main__":
     a = ForestSimulator()
-    a.run()
-    '''win = GraphWin('Forest', 100, 100)
-    b = Rectangle(Point(4, 4), Point(4, 4))
-    c = Rectangle(Point(1,3), Point(4,7))
-    b.setFill("red")
-    b.draw(win)  
-    win.getMouse() 
-    c.setFill("brown")
-    c.draw(win)   
-    win.getMouse() 
-    win.close()'''
+    a.run(100,100,2)
+
